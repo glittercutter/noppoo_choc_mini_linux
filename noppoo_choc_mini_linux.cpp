@@ -9,6 +9,7 @@
 // remapping to 'control right': "keycode 0x69 = Caps_Lock"
 
 
+#include <cstdlib>
 #include <iostream>
 #include <stdlib.h>
 #include <X11/Xlib.h>
@@ -30,31 +31,43 @@
 #define F12_KEYCODE 96
 
 
+Display* g_dpy;
+
+
+// Cleanup
+void atExit()
+{
+    XCloseDisplay(g_dpy);
+}
+
+
 int main()
 {
-    Display* dpy = XOpenDisplay(0);
+    std::atexit(*atExit);
+
+    g_dpy = XOpenDisplay(0);
     XEvent ev;
-    Window grabWindow = DefaultRootWindow(dpy);
+    Window grabWindow = DefaultRootWindow(g_dpy);
 
     const bool ownerEvents = false;
     const int pointerMode = GrabModeAsync;
     const int keyboardMode = GrabModeAsync;
 
-    XGrabKey(dpy, NUMLOCK_KEYCODE, AnyModifier, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, NUMLOCK_KEYCODE, AnyModifier, grabWindow, ownerEvents, pointerMode, keyboardMode);
 
     const int mod = ControlMask | Mod1Mask;
-    XGrabKey(dpy, F1_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F2_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F3_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F4_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F5_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F6_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F7_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F8_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F9_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F10_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F11_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
-    XGrabKey(dpy, F12_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F1_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F2_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F3_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F4_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F5_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F6_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F7_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F8_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F9_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F10_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F11_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
+    XGrabKey(g_dpy, F12_KEYCODE, mod, grabWindow, ownerEvents, pointerMode, keyboardMode);
 
     // Coudln't find a way to get an accurate state
     // We assume numlock is not enabled for our local state
@@ -62,7 +75,7 @@ int main()
 
     while (42)
     {
-        XNextEvent(dpy, &ev);
+        XNextEvent(g_dpy, &ev);
         switch (ev.type)
         {
             case KeyPress:
@@ -146,6 +159,5 @@ int main()
         }
     }
 
-    XCloseDisplay(dpy);
     return 0;
 }
